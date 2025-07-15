@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useFlowState } from '@/hooks/useFlowState';
+import { useExitIntent } from '@/hooks/useExitIntent';
 import { FloatingOrbs } from './FloatingOrbs';
 import { Header } from './Header';
 import { ProgressBar } from './ProgressBar';
@@ -7,9 +8,15 @@ import { HeroSection } from './steps/HeroSection';
 import { WelcomeStep } from './steps/WelcomeStep';
 import { VerificationStep } from './steps/VerificationStep';
 import { CompletionStep } from './steps/CompletionStep';
+import { ExitIntentPopup } from '../forms/ExitIntentPopup';
 
 export const AffiliateFlowLanding = memo(() => {
   const { state, actions } = useFlowState();
+  const { isTriggered: showExitIntent, reset: resetExitIntent } = useExitIntent({
+    enabled: state.currentStep === 0, // Só mostrar na hero section
+    delay: 10, // 10 segundos mínimo na página
+    maxDisplays: 2 // máximo 2 vezes
+  });
 
   const renderCurrentStep = () => {
     switch (state.currentStep) {
@@ -75,6 +82,12 @@ export const AffiliateFlowLanding = memo(() => {
       <main className="relative z-10">
         {renderCurrentStep()}
       </main>
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup 
+        isVisible={showExitIntent}
+        onClose={resetExitIntent}
+      />
     </div>
   );
 });

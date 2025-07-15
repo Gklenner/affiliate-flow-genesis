@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { LoadingButton } from '../LoadingButton';
+import { LeadCaptureForm } from '../../forms/LeadCaptureForm';
 import { STATS_CARDS, FEATURES } from '@/types/landing';
 
 interface HeroSectionProps {
@@ -67,10 +68,14 @@ export const HeroSection = memo<HeroSectionProps>(({ onGetLink, isLoading }) => 
             >
               🚀 Quero Meu Link de Cadastro
             </LoadingButton>
+            
+            <p className="text-xs text-lp-light/60 mt-3">
+              Acesso 100% gratuito • Material liberado instantaneamente
+            </p>
           </div>
 
           {/* Features */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto mb-16">
             {FEATURES.map((feature, index) => (
               <div 
                 key={feature.title}
@@ -82,6 +87,17 @@ export const HeroSection = memo<HeroSectionProps>(({ onGetLink, isLoading }) => 
                 <p className="text-sm text-lp-light/70">{feature.description}</p>
               </div>
             ))}
+          </div>
+
+          {/* Formulário de Captura de Lead */}
+          <div className="max-w-lg mx-auto">
+            <LeadCaptureForm 
+              source="hero_section"
+              onSuccess={() => {
+                // Auto-clica no botão principal após captura
+                setTimeout(() => onGetLink(), 1000);
+              }}
+            />
           </div>
         </div>
       </div>
