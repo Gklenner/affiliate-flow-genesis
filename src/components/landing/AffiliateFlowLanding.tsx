@@ -1,0 +1,82 @@
+import { memo } from 'react';
+import { useFlowState } from '@/hooks/useFlowState';
+import { FloatingOrbs } from './FloatingOrbs';
+import { Header } from './Header';
+import { ProgressBar } from './ProgressBar';
+import { HeroSection } from './steps/HeroSection';
+import { WelcomeStep } from './steps/WelcomeStep';
+import { VerificationStep } from './steps/VerificationStep';
+import { CompletionStep } from './steps/CompletionStep';
+
+export const AffiliateFlowLanding = memo(() => {
+  const { state, actions } = useFlowState();
+
+  const renderCurrentStep = () => {
+    switch (state.currentStep) {
+      case 0:
+        return (
+          <HeroSection
+            onGetLink={actions.generateLink}
+            isLoading={state.isLoading}
+          />
+        );
+      
+      case 1:
+        return (
+          <WelcomeStep
+            onAppDownload={actions.markAppDownloaded}
+          />
+        );
+      
+      case 2:
+        return (
+          <VerificationStep
+            onVerify={actions.verifyAccess}
+            isLoading={state.isLoading}
+          />
+        );
+      
+      case 3:
+        // Auto-advance to step 4 (handled by verifyAccess)
+        return null;
+      
+      case 4:
+        return (
+          <CompletionStep
+            onSendMaterial={actions.sendMaterial}
+            onCopyLink={actions.copyLink}
+            materialSent={state.materialSent}
+            linkCopied={state.linkCopied}
+            isLoading={state.isLoading}
+          />
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-lp-navy relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 grid-pattern opacity-30" />
+      <FloatingOrbs />
+      
+      {/* Header */}
+      <Header />
+      
+      {/* Progress Bar (visible after step 0) */}
+      <ProgressBar 
+        currentStep={state.currentStep} 
+        isVisible={state.currentStep > 0} 
+      />
+      
+      {/* Main Content */}
+      <main className="relative z-10">
+        {renderCurrentStep()}
+      </main>
+    </div>
+  );
+});
+
+AffiliateFlowLanding.displayName = 'AffiliateFlowLanding';
