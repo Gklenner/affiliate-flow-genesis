@@ -11,10 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Gift, Users, TrendingUp } from 'lucide-react';
 
 // Schema de validação com foco em conversão
-const leadSchema = z.object({
-  name: z.string()
-    .min(2, 'Nome deve ter pelo menos 2 caracteres')
-    .max(50, 'Nome muito longo'),
+const createLeadSchema = (showNameField: boolean) => z.object({
+  name: showNameField 
+    ? z.string()
+        .min(2, 'Nome deve ter pelo menos 2 caracteres')
+        .max(50, 'Nome muito longo')
+    : z.string().optional(),
   email: z.string()
     .email('Email inválido')
     .min(1, 'Email é obrigatório'),
@@ -25,12 +27,18 @@ const leadSchema = z.object({
     })
 });
 
-type LeadFormValues = z.infer<typeof leadSchema>;
+type LeadFormValues = {
+  name?: string;
+  email: string;
+  phone?: string;
+};
 
 interface LeadCaptureFormProps {
   source?: string;
   variant?: 'popup' | 'inline' | 'sidebar';
   showBenefits?: boolean;
+  showNameField?: boolean;
+  buttonText?: string;
   onSuccess?: (data: LeadFormData) => void;
 }
 
@@ -38,6 +46,8 @@ export const LeadCaptureForm = ({
   source = 'hero_form', 
   variant = 'inline',
   showBenefits = true,
+  showNameField = true,
+  buttonText = 'Quero Receber Grátis',
   onSuccess 
 }: LeadCaptureFormProps) => {
   const [showPhone, setShowPhone] = useState(false);
@@ -45,7 +55,7 @@ export const LeadCaptureForm = ({
   const { toast } = useToast();
 
   const form = useForm<LeadFormValues>({
-    resolver: zodResolver(leadSchema),
+    resolver: zodResolver(createLeadSchema(showNameField)),
     defaultValues: {
       name: '',
       email: '',
@@ -55,7 +65,7 @@ export const LeadCaptureForm = ({
 
   const onSubmit = async (values: LeadFormValues) => {
     const leadData: LeadFormData = {
-      name: values.name,
+      name: values.name || 'Usuário',
       email: values.email,
       phone: values.phone,
       source,
@@ -155,23 +165,25 @@ export const LeadCaptureForm = ({
       {/* Formulário */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lp-light text-sm">Nome completo</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Digite seu nome completo"
-                    className="bg-background/10 border-lp-light/20 text-lp-light placeholder:text-lp-light/50 focus:border-primary"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {showNameField && (
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-lp-light text-sm">Nome completo</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Digite seu nome completo"
+                      className="bg-background/10 border-lp-light/20 text-lp-light placeholder:text-lp-light/50 focus:border-primary"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -237,7 +249,7 @@ export const LeadCaptureForm = ({
               </>
             ) : (
               <>
-                🚀 Quero Receber GRÁTIS
+                🚀 {buttonText}
               </>
             )}
           </Button>

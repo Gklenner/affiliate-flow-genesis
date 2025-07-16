@@ -32,22 +32,12 @@ export const AffiliateFlowLanding = memo(() => {
         return (
           <WelcomeStep
             onAppDownload={actions.markAppDownloaded}
-          />
-        );
-      
-      case 2:
-        return (
-          <VerificationStep
             onVerify={actions.verifyAccess}
             isLoading={state.isLoading}
           />
         );
       
-      case 3:
-        // Auto-advance to step 4 (handled by verifyAccess)
-        return null;
-      
-      case 4:
+      case 2:
         return (
           <CompletionStep
             onSendMaterial={actions.sendMaterial}

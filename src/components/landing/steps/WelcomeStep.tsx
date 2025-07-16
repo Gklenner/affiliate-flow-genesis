@@ -1,110 +1,154 @@
-import { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { APP_LINKS } from '@/types/landing';
+import { memo, useState } from 'react';
+import { LoadingButton } from '../LoadingButton';
+import { LeadCaptureForm } from '../../forms/LeadCaptureForm';
+import { APP_LINKS, AFFILIATE_LINK } from '@/types/landing';
 
 interface WelcomeStepProps {
   onAppDownload: (platform: 'android' | 'ios') => void;
+  onVerify: () => void;
+  isLoading: boolean;
 }
 
-export const WelcomeStep = memo<WelcomeStepProps>(({ onAppDownload }) => {
+export const WelcomeStep = memo<WelcomeStepProps>(({ onAppDownload, onVerify, isLoading }) => {
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailCaptured, setEmailCaptured] = useState(false);
+  const [downloadConfirmed, setDownloadConfirmed] = useState(false);
+
   const handleAppDownload = (platform: 'android' | 'ios', url: string) => {
-    // Abre loja em nova aba
     window.open(url, '_blank');
+    onAppDownload(platform);
+    setDownloadConfirmed(true);
     
-    // Marca como baixado e avança para próxima etapa
+    // Mostrar form de email após 2 segundos
     setTimeout(() => {
-      onAppDownload(platform);
+      setShowEmailForm(true);
     }, 2000);
   };
 
+  const handleEmailSuccess = () => {
+    setEmailCaptured(true);
+    setShowEmailForm(false);
+    
+    // Iniciar verificação após 1 segundo
+    setTimeout(() => {
+      onVerify();
+    }, 1000);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center pt-32">
+    <div className="min-h-screen flex items-center justify-center pt-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto">
-          {/* Status Success */}
-          <div className="inline-flex items-center space-x-2 glass-strong px-6 py-3 rounded-full mb-8 animate-fade-in">
-            <span className="text-2xl">✅</span>
-            <span className="text-lg font-medium text-lp-light">Link enviado! Verifique seu inbox</span>
-          </div>
-
-          {/* Title */}
-          <h2 className="text-display font-bold text-lp-light mb-6 animate-slide-up">
-            Agora baixe o aplicativo para continuar
-          </h2>
-
-          {/* Benefits */}
-          <div className="glass-strong p-8 rounded-3xl mb-12 animate-fade-in">
-            <h3 className="text-xl font-semibold text-lp-light mb-6">
-              🎯 O que você vai conseguir:
-            </h3>
-            <div className="space-y-4 text-left">
-              <div className="flex items-center space-x-3">
-                <span className="text-lp-green text-xl">✓</span>
-                <span className="text-lp-light">Renda recorrente de R$ 15.000 a R$ 55.000 mensais</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lp-green text-xl">✓</span>
-                <span className="text-lp-light">Sistema 100% automatizado</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lp-green text-xl">✓</span>
-                <span className="text-lp-light">Suporte completo e material exclusivo</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lp-green text-xl">✓</span>
-                <span className="text-lp-light">Pagamentos semanais garantidos</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Next Steps */}
-          <div className="glass p-6 rounded-2xl mb-8">
-            <h4 className="text-lg font-semibold text-lp-light mb-4">
-              📱 Próximos passos obrigatórios:
-            </h4>
-            <div className="text-sm text-lp-light/80 space-y-2">
-              <p>1. Baixe o aplicativo oficial GRIP</p>
-              <p>2. Faça seu cadastro usando seu link exclusivo</p>
-              <p>3. Conclua a verificação de acesso</p>
-              <p>4. Receba seu material de trabalho</p>
-            </div>
-          </div>
-
-          {/* App Download Buttons */}
-          <div className="space-y-4">
-            <p className="text-lp-light/80 mb-6">Escolha sua plataforma:</p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {APP_LINKS.map((app) => (
-                <Button
-                  key={app.platform}
-                  onClick={() => handleAppDownload(app.platform, app.url)}
-                  className="btn-primary px-8 py-4 text-lg flex items-center space-x-3 min-w-[200px]"
+        <div className="max-w-3xl mx-auto text-center">
+          {/* Link de Afiliado */}
+          <div className="glass-strong p-8 rounded-3xl mb-8 animate-fade-in">
+            <div className="text-6xl mb-6">🔗</div>
+            <h2 className="text-2xl font-bold text-lp-light mb-4">
+              ✅ Seu Link de Afiliado Está Pronto!
+            </h2>
+            <div className="glass p-4 rounded-2xl mb-6">
+              <p className="text-sm text-lp-light/70 mb-2">Seu link exclusivo:</p>
+              <div className="flex items-center justify-center space-x-2">
+                <code className="text-primary font-mono text-sm bg-lp-light/10 px-3 py-1 rounded">
+                  {AFFILIATE_LINK}
+                </code>
+                <button
+                  onClick={() => navigator.clipboard.writeText(AFFILIATE_LINK)}
+                  className="text-primary hover:text-primary/80 text-sm"
                 >
-                  <span className="text-2xl">{app.icon}</span>
-                  <span>
-                    Baixar para {app.platform === 'android' ? 'Android' : 'iOS'}
-                  </span>
-                </Button>
+                  📋 Copiar
+                </button>
+              </div>
+            </div>
+            <p className="text-sm text-lp-light/60">
+              Link copiado com sucesso! Agora continue o processo.
+            </p>
+          </div>
+
+          {/* Instruções para Download */}
+          <div className="glass-strong p-8 rounded-3xl mb-8 animate-fade-in">
+            <div className="text-6xl mb-6">📱</div>
+            <h3 className="text-xl font-bold text-lp-light mb-4">
+              Baixe o App GRIP para Continuar
+            </h3>
+            <p className="text-lp-light/70 mb-8">
+              Para acessar o sistema e começar a ganhar, você precisa baixar o app oficial.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {APP_LINKS.map((link) => (
+                <button
+                  key={link.platform}
+                  onClick={() => handleAppDownload(link.platform, link.url)}
+                  className="glass p-6 rounded-2xl hover-lift transition-all duration-300 hover:bg-primary/10"
+                  disabled={downloadConfirmed}
+                >
+                  <div className="text-4xl mb-3">{link.icon}</div>
+                  <div className="font-semibold text-lp-light capitalize">
+                    {link.platform === 'android' ? 'Android' : 'iOS'}
+                  </div>
+                  <div className="text-sm text-lp-light/70 mt-1">
+                    {downloadConfirmed ? '✅ Download Iniciado' : 'Baixar Agora'}
+                  </div>
+                </button>
               ))}
             </div>
+
+            {downloadConfirmed && (
+              <div className="glass p-4 rounded-2xl animate-fade-in">
+                <div className="text-lp-green text-sm">
+                  ✅ Download iniciado! Instale o app e continue.
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Trust Indicators */}
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div className="glass p-4 rounded-xl">
-              <div className="text-2xl mb-2">🔒</div>
-              <div className="text-sm text-lp-light/70">100% Seguro</div>
+          {/* Formulário de Email */}
+          {showEmailForm && (
+            <div className="glass-strong p-8 rounded-3xl mb-8 animate-fade-in">
+              <div className="text-6xl mb-6">📧</div>
+              <h3 className="text-xl font-bold text-lp-light mb-4">
+                Verificação de Acesso
+              </h3>
+              <p className="text-lp-light/70 mb-6">
+                Para validar seu acesso ao sistema, precisamos do seu email.
+              </p>
+              
+              <LeadCaptureForm 
+                source="welcome_step"
+                onSuccess={handleEmailSuccess}
+                showNameField={false}
+                buttonText="Verificar Meu Acesso"
+              />
             </div>
-            <div className="glass p-4 rounded-xl">
-              <div className="text-2xl mb-2">⚡</div>
-              <div className="text-sm text-lp-light/70">Instalação Rápida</div>
+          )}
+
+          {/* Verificação em Andamento */}
+          {emailCaptured && (
+            <div className="glass-strong p-8 rounded-3xl animate-fade-in">
+              <div className="text-6xl mb-6">🔐</div>
+              <h3 className="text-xl font-bold text-lp-light mb-4">
+                Verificando Acesso ao Sistema
+              </h3>
+              <p className="text-lp-light/70 mb-6">
+                Validando suas credenciais e configurações...
+              </p>
+              
+              <div className="flex items-center justify-center space-x-3 mb-6">
+                <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
+                <div className="w-3 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                <div className="w-3 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+              </div>
+              
+              <LoadingButton
+                isLoading={isLoading}
+                onClick={() => {}}
+                disabled={true}
+                className="pointer-events-none"
+              >
+                Verificando...
+              </LoadingButton>
             </div>
-            <div className="glass p-4 rounded-xl">
-              <div className="text-2xl mb-2">✅</div>
-              <div className="text-sm text-lp-light/70">Verificado</div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

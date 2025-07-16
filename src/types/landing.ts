@@ -1,6 +1,6 @@
 // AffiliateFlow Landing Page Types
 
-export type FlowStep = 0 | 1 | 2 | 3 | 4;
+export type FlowStep = 0 | 1 | 2;
 
 export interface FlowState {
   currentStep: FlowStep;
@@ -95,31 +95,18 @@ export const STEP_CONFIGS: Record<FlowStep, StepConfig> = {
     id: 0,
     title: 'AffiliateFlow Premium',
     description: 'Renda recorrente de R$ 15.000 a R$ 55.000 mensais',
-    buttonText: 'Quero Meu Link de Cadastro',
+    buttonText: 'Quero Meu Link de Afiliado',
     nextStep: 1
   },
   1: {
     id: 1,
-    title: '✅ Link enviado! Verifique seu inbox',
-    description: 'Agora baixe o aplicativo para continuar',
+    title: '📱 Baixe o App + Verificação',
+    description: 'Download do app e captura de email para verificação',
     nextStep: 2
   },
   2: {
     id: 2,
-    title: '📱 App Instalado',
-    description: 'Vamos verificar seu acesso ao sistema',
-    buttonText: 'Verificar Meu Acesso',
-    nextStep: 3
-  },
-  3: {
-    id: 3,
-    title: '🔐 Acesso Verificado',
-    description: 'Validando credenciais e configurações',
-    nextStep: 4
-  },
-  4: {
-    id: 4,
-    title: '🎉 Parabéns! Processo Completo',
-    description: 'Seu material exclusivo está pronto para envio'
+    title: '🎉 Material Exclusivo Enviado',
+    description: 'Seu material foi enviado para o email fornecido'
   }
 };

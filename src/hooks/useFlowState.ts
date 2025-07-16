@@ -18,7 +18,7 @@ export const useFlowState = () => {
   const nextStep = useCallback((targetStep?: FlowStep) => {
     setState(prev => ({
       ...prev,
-      currentStep: targetStep || (Math.min(prev.currentStep + 1, 4) as FlowStep)
+      currentStep: targetStep || (Math.min(prev.currentStep + 1, 2) as FlowStep)
     }));
   }, []);
 
@@ -47,8 +47,7 @@ export const useFlowState = () => {
   const markAppDownloaded = useCallback((platform: 'android' | 'ios') => {
     setState(prev => ({
       ...prev,
-      hasDownloadedApp: true,
-      currentStep: 2
+      hasDownloadedApp: true
     }));
   }, []);
 
@@ -63,7 +62,7 @@ export const useFlowState = () => {
       ...prev,
       isLoading: false,
       isVerified: true,
-      currentStep: 4
+      currentStep: 2
     }));
     
     return true;
